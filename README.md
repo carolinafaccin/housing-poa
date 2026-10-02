@@ -108,7 +108,10 @@ src/housing/
   data.py              dataset download and loading, typology labels
   metrics.py           tables and validation against the paper
   osm.py               OpenStreetMap streets (Overpass API, cached)
-  figures.py, style.py figures in the project's visual identity
+  figures.py           figures
+  style.py             figure style: source line and repository name
+  brand.py             visual identity (colors, palettes, Source Code Pro, layout); copied
+                       from the author's brand repository, do not edit here
 tests/                 synthetic unit tests + validation against the paper
 assets/fonts/          Source Code Pro (SIL OFL)
 ```
