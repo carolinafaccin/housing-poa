@@ -78,32 +78,32 @@ def city_outline(neighborhoods):
     return gpd.GeoSeries([neighborhoods.union_all()], crs=neighborhoods.crs)
 
 
-def load_mcmv(raw_dir):
+def load_mcmv(sources_dir):
     """Federal housing program (Minha Casa Minha Vida) developments, as points. None if missing."""
-    if raw_dir is None or not (raw_dir / MCMV).exists():
+    if sources_dir is None or not (sources_dir / MCMV).exists():
         return None
-    m = gpd.read_file(raw_dir / MCMV).to_crs(CRS)
+    m = gpd.read_file(sources_dir / MCMV).to_crs(CRS)
     m = m[m.geometry.notna() & ~m.geometry.is_empty]
     m["geometry"] = m.geometry.force_2d().representative_point()
     m["Name"] = m["Name"].str.strip()
     return m.drop_duplicates("Name")[["Name", "geometry"]]
 
 
-def load_water(raw_dir, city, data_dir):
-    """Lake Guaíba and the Jacuí delta channels (IBGE BC250), clipped and cached in data_dir/cache."""
-    cache = data_dir / "cache" / "water.gpkg"
+def load_water(sources_dir, city, outputs_dir):
+    """Lake Guaíba and the Jacuí delta channels (IBGE BC250), clipped and cached in outputs_dir/cache."""
+    cache = outputs_dir / "cache" / "water.gpkg"
     if cache.exists():
         return gpd.read_file(cache)
-    if raw_dir is None or not (raw_dir / WATER).exists():
+    if sources_dir is None or not (sources_dir / WATER).exists():
         return None
     w, s, e, n = city.to_crs(4674).total_bounds
-    g = gpd.read_file(raw_dir / WATER, bbox=(w - 0.1, s - 0.1, e + 0.1, n + 0.1)).to_crs(CRS)[["geometry"]]
+    g = gpd.read_file(sources_dir / WATER, bbox=(w - 0.1, s - 0.1, e + 0.1, n + 0.1)).to_crs(CRS)[["geometry"]]
     cache.parent.mkdir(parents=True, exist_ok=True)
     g.to_file(cache)
     return g
 
 
-def load_streets(city, data_dir):
-    """OpenStreetMap streets around the city (downloaded once, cached in data_dir/cache)."""
+def load_streets(city, outputs_dir):
+    """OpenStreetMap streets around the city (downloaded once, cached in outputs_dir/cache)."""
     w, s, e, n = city.to_crs(4326).total_bounds
-    return osm.roads((s - 0.01, w - 0.01, n + 0.01, e + 0.01), data_dir / "cache" / "osm_streets.json", crs=CRS)
+    return osm.roads((s - 0.01, w - 0.01, n + 0.01, e + 0.01), outputs_dir / "cache" / "osm_streets.json", crs=CRS)

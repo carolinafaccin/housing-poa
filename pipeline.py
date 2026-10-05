@@ -4,7 +4,7 @@
     python pipeline.py --only tables         # tables and validation against the paper
     python pipeline.py --only figures docs   # redraw figures and copy the README ones
 
-Folders come from config/config.local.json (dataset_dir, raw_dir, data_dir).
+Folders come from config/config.local.json (dataset_dir, sources_dir, outputs_dir).
 """
 import argparse
 import shutil
@@ -19,8 +19,8 @@ README_FIGURES = ["map_neighborhoods", "map_form", "form_by_neighborhood", "map_
                   "map_typology", "typology_profile", "map_mcmv", "map_case_studies"]
 
 
-def run_tables(c, data_dir):
-    t = data_dir / "tables"
+def run_tables(c, outputs_dir):
+    t = outputs_dir / "tables"
     metrics.counts_by_type(c).round(1).to_csv(t / "types.csv", index=False)
     metrics.crosstab_share(c, "period3", ["Before 2000", "2000–2010", "2010–2022"]).round(1).to_csv(t / "types_by_period.csv")
     metrics.crosstab_share(c, "income", data.INCOME).round(1).to_csv(t / "types_by_income.csv")
@@ -36,28 +36,28 @@ def run_tables(c, data_dir):
     return val["ok"].all()
 
 
-def run_figures(c, nb, raw_dir, data_dir):
+def run_figures(c, nb, sources_dir, outputs_dir):
     style.setup()
-    f = data_dir / "figures"
+    f = outputs_dir / "figures"
     city = data.city_outline(nb)
-    ctx = figures.Context(nb, city, water=data.load_water(raw_dir, city, data_dir),
-                          streets=data.load_streets(city, data_dir))
+    ctx = figures.Context(nb, city, water=data.load_water(sources_dir, city, outputs_dir),
+                          streets=data.load_streets(city, outputs_dir))
     figures.map_neighborhoods(c, ctx, f / "map_neighborhoods.png")
     figures.map_form(c, ctx, f / "map_form.png")
     figures.form_by_neighborhood(c, f / "form_by_neighborhood.png")
     figures.map_period_income(c, ctx, f / "map_period_income.png")
     figures.map_typology(c, ctx, f / "map_typology.png")
     figures.typology_profile(c, f / "typology_profile.png")
-    figures.map_mcmv(c, ctx, data.load_mcmv(raw_dir), f / "map_mcmv.png")
+    figures.map_mcmv(c, ctx, data.load_mcmv(sources_dir), f / "map_mcmv.png")
     figures.map_case_studies(c, ctx, f / "map_case_studies.png")
     print(f"figures written to {f}")
 
 
-def run_docs(data_dir):
+def run_docs(outputs_dir):
     dest = Path(__file__).parent / "docs" / "img"
     dest.mkdir(parents=True, exist_ok=True)
     for name in README_FIGURES:
-        shutil.copy(data_dir / "figures" / f"{name}.png", dest / f"{name}.png")
+        shutil.copy(outputs_dir / "figures" / f"{name}.png", dest / f"{name}.png")
     print(f"copied {len(README_FIGURES)} figures to {dest}")
 
 
@@ -67,18 +67,18 @@ def main():
     args = p.parse_args()
     steps = args.only or ["tables", "figures", "docs"]
 
-    dataset_dir, raw_dir, data_dir = config.load()
+    dataset_dir, sources_dir, outputs_dir = config.load()
     data.fetch_dataset(dataset_dir)
     c = data.load_condominiums(dataset_dir)
     nb = data.load_neighborhoods(dataset_dir)
     print(f"{len(c)} gated communities, {len(nb)} neighborhoods")
     ok = True
     if "tables" in steps:
-        ok = run_tables(c, data_dir)
+        ok = run_tables(c, outputs_dir)
     if "figures" in steps:
-        run_figures(c, nb, raw_dir, data_dir)
+        run_figures(c, nb, sources_dir, outputs_dir)
     if "docs" in steps:
-        run_docs(data_dir)
+        run_docs(outputs_dir)
     if not ok:
         sys.exit("validation failed: computed values differ from the published ones (see tables/validation.csv)")
 
