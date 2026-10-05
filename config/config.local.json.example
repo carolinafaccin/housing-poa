@@ -1,5 +1,5 @@
 {
   "dataset_dir": "/path/to/zenodo/housing-poa",
-  "raw_dir": "/path/to/raw_dir (optional)",
-  "data_dir": "/path/to/outputs"
+  "sources_dir": "/path/to/sources_dir (optional)",
+  "outputs_dir": "/path/to/outputs"
 }

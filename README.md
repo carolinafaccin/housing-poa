@@ -48,7 +48,7 @@ flowchart LR
 2. **Attributes.** Each community carries its building form, size, period of construction (read from Google Earth images of 2002, 2012 and 2022), amenities and the income of the census tract it overlaps most (IBGE Census 2010).
 3. **Typology.** Nine types (A1 to E) combine building form, amenities and size, following the paper.
 4. **Tables.** Counts by type, neighborhood and form; shares by period of construction and income class.
-5. **Context layers (optional).** Federal housing program developments (Minha Casa Minha Vida) and Lake Guaíba come from the local `raw_dir`; streets are downloaded from OpenStreetMap once and cached. Figures that need a missing layer are drawn without it.
+5. **Context layers (optional).** Federal housing program developments (Minha Casa Minha Vida) and Lake Guaíba come from the local `sources_dir`; streets are downloaded from OpenStreetMap once and cached. Figures that need a missing layer are drawn without it.
 
 ## Run it
 
@@ -66,10 +66,10 @@ pytest                                           # unit tests + validation again
 | Key | Purpose |
 |---|---|
 | `dataset_dir` | The open dataset. Downloaded from Zenodo when empty |
-| `raw_dir` | Optional. Shared raw-data catalog with the federal housing program layer (`prefeituras_municipais/porto_alegre/mcmv_2/`) and IBGE water bodies (`ibge/hidrografia/2017/`) |
-| `data_dir` | This project's outputs: `tables/`, `figures/`, `cache/` |
+| `sources_dir` | Optional. Shared raw-data catalog with the federal housing program layer (`prefeituras_municipais/porto_alegre/mcmv_2/`) and IBGE water bodies (`ibge/hidrografia/2017/`) |
+| `outputs_dir` | This project's outputs: `tables/`, `figures/`, `cache/` |
 
-## Outputs (`data_dir`)
+## Outputs (`outputs_dir`)
 
 | File | Content |
 |---|---|

@@ -1,4 +1,4 @@
-"""OpenStreetMap streets via the Overpass API, cached as JSON in data_dir/cache/."""
+"""OpenStreetMap streets via the Overpass API, cached as JSON in outputs_dir/cache/."""
 import json
 import time
 
